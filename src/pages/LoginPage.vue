@@ -11,4 +11,24 @@
 </template>
 
 <script>
+import { ref } from 'vue'
+
+export default {
+  setup() {
+    const username = ref('')
+    const password = ref('')
+    const errorMessage = ref('')
+
+    const handleLogin = () => {
+      if (!username.value || !password.value) {
+        errorMessage.value = 'Please enter both username and password.'
+      } else {
+        console.log('Login attempt:', { username: username.value, password: password.value })
+        errorMessage.value = '' // Reset error message
+      }
+    }
+
+    return { username, password, errorMessage, handleLogin }
+  },
+}
 </script>
