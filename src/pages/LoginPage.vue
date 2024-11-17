@@ -72,8 +72,6 @@ export default {
 
         if (data.status === 'success') {
           const decodedToken = JSON.parse(atob(data.data.token.split('.')[1]))
-          console.log(decodedToken.role);
-
           if (decodedToken.role !== 'admin') {
             errorMessage.value = 'Access denied. Only admins can log in.'
             return
