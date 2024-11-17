@@ -41,19 +41,46 @@
 
 <script>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 
 export default {
   setup() {
     const username = ref('')
     const password = ref('')
     const errorMessage = ref('')
+    const router = useRouter()
 
-    const handleLogin = () => {
+    const handleLogin = async () => {
       if (!username.value || !password.value) {
         errorMessage.value = 'Please enter both username and password.'
-      } else {
-        console.log('Login attempt:', { username: username.value, password: password.value })
-        errorMessage.value = ''
+        return
+      }
+
+      try {
+        const response = await fetch(
+          'https://sneaker-configurator-backend.onrender.com/users/login',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ username: username.value, password: password.value }),
+          },
+        )
+
+        const data = await response.json()
+
+        if (data.status === 'success') {
+          console.log('Token werkt? ' + data.data.token)
+          localStorage.setItem('token', data.data.token)
+
+          router.push('/dashboard')
+        } else {
+          errorMessage.value = data.message || 'Invalid login credentials.'
+        }
+      } catch (error) {
+        errorMessage.value = 'An error occurred. Please try again later.'
+        console.error(error)
       }
     }
 
