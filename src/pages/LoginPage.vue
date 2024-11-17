@@ -71,8 +71,15 @@ export default {
         const data = await response.json()
 
         if (data.status === 'success') {
-          localStorage.setItem('token', data.data.token)
+          const decodedToken = JSON.parse(atob(data.data.token.split('.')[1]))
+          console.log(decodedToken.role);
 
+          if (decodedToken.role !== 'admin') {
+            errorMessage.value = 'Access denied. Only admins can log in.'
+            return
+          }
+
+          localStorage.setItem('token', data.data.token)
           router.push('/dashboard')
         } else {
           errorMessage.value = data.message || 'Invalid login credentials.'
