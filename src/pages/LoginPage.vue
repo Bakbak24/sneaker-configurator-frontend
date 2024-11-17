@@ -71,7 +71,6 @@ export default {
         const data = await response.json()
 
         if (data.status === 'success') {
-          console.log('Token werkt? ' + data.data.token)
           localStorage.setItem('token', data.data.token)
 
           router.push('/dashboard')
