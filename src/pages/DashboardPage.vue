@@ -1,16 +1,4 @@
 <style scoped>
-nav ul li:hover svg path {
-  stroke: #9ca3af;
-}
-
-#log:hover svg path {
-  stroke: #9ca3af;
-}
-
-nav ul li:hover a {
-  color: #9ca3af;
-}
-
 .table-container {
   overflow-x: auto;
 }
@@ -20,7 +8,8 @@ table {
   border-collapse: collapse;
 }
 
-th, td {
+th,
+td {
   padding: 1rem;
   text-align: left;
   border-bottom: 1px solid #ddd;
@@ -60,89 +49,111 @@ tr:hover {
   font-weight: bold;
 }
 
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+}
+
+.popup-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.popup-content h2 {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.popup-content p {
+  margin-bottom: 0.5rem;
+}
+
+.popup-content select {
+  margin-top: 0.5rem;
+  width: 100%;
+  padding: 0.5rem;
+}
+
+.popup-content button {
+  margin-top: 1rem;
+}
+
+.status-shipped {
+  background-color: #d1fae5;
+  color: #065f46;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.status-in-production {
+  background-color: #fef08a;
+  color: #854d0e;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.status-canceled {
+  background-color: #fecaca;
+  color: #991b1b;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
 .view-details {
   color: #fff;
   background-color: #000;
+  border: 1px solid transparent;
   padding: 0.5rem 1rem;
   text-decoration: none;
   text-align: center;
   display: inline-block;
+  transition: all 0.1s;
 }
 
 .view-details:hover {
-  background-color: #333;
+  background-color: white;
+  color: #000;
+  border: 1px solid #000;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.delete-btn {
+  color: #fff;
+  background-color: #e3342f;
+  border: none;
+  padding: 0.5rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.delete-btn:hover {
+  background-color: #cc1f1a;
 }
 </style>
 
 <template>
   <div class="min-h-screen flex bg-gray-100">
-
-    <!-- Sidebar -->
-    <aside class="bg-black text-white w-64 flex flex-col justify-between py-10 px-6">
-      <div>
-        <div class="flex justify-start mb-12">
-          <img src="/swear-logo-wh.png" alt="Swear London Logo" class="w-32 h-auto" />
-        </div>
-        <nav>
-          <ul class="space-y-6">
-            <li class="flex items-center space-x-3 group">
-              <svg
-                width="22"
-                height="22"
-                viewBox="0 0 22 22"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                class="w-5 h-5 text-white group-hover:text-gray-400"
-              >
-                <path
-                  d="M18.9114 12.6216H14.7114C14.1579 12.6239 13.6278 12.8448 13.2366 13.2363C12.8454 13.6277 12.6247 14.1579 12.6227 14.7113V18.9113C12.6224 19.1857 12.6762 19.4574 12.7811 19.711C12.886 19.9645 13.0398 20.1949 13.2338 20.3889C13.4278 20.5829 13.6582 20.7367 13.9117 20.8416C14.1653 20.9465 14.437 21.0003 14.7114 21H18.9114C19.4652 20.9997 19.9963 20.7796 20.3879 20.3879C20.7796 19.9963 20.9997 19.4652 21 18.9113V14.7113C21.0003 14.437 20.9465 14.1653 20.8416 13.9117C20.7367 13.6582 20.5829 13.4278 20.3889 13.2338C20.1949 13.0398 19.9645 12.886 19.711 12.7811C19.4574 12.6762 19.1857 12.6224 18.9114 12.6227M18.9114 1H3.08865C2.81429 0.999717 2.54256 1.05355 2.28902 1.15841C2.03549 1.26327 1.80512 1.41711 1.61112 1.61112C1.41711 1.80512 1.26328 2.03549 1.15841 2.28902C1.05355 2.54256 0.999718 2.81428 1 3.08865V7.28865C0.999576 7.5631 1.0533 7.83495 1.1581 8.08861C1.2629 8.34227 1.41672 8.57276 1.61074 8.76688C1.80476 8.961 2.03517 9.11493 2.28877 9.21987C2.54238 9.3248 2.81419 9.37866 3.08865 9.37838H18.9114C19.1857 9.37866 19.4574 9.32483 19.711 9.21997C19.9645 9.1151 20.1949 8.96127 20.3889 8.76726C20.5829 8.57326 20.7367 8.34289 20.8416 8.08936C20.9465 7.83582 21.0003 7.56409 21 7.28973V3.08865C21.0003 2.81428 20.9465 2.54256 20.8416 2.28902C20.7367 2.03549 20.5829 1.80512 20.3889 1.61112C20.1949 1.41711 19.9645 1.26327 19.711 1.15841C19.4574 1.05355 19.1857 0.999717 18.9114 1ZM7.28865 12.6216H3.08865C2.81419 12.6213 2.54238 12.6752 2.28877 12.7801C2.03517 12.8851 1.80476 13.039 1.61074 13.2331C1.41672 13.4272 1.2629 13.6577 1.1581 13.9114C1.0533 14.165 0.999576 14.4369 1 14.7113V18.9113C0.999718 19.1857 1.05355 19.4574 1.15841 19.711C1.26328 19.9645 1.41711 20.1949 1.61112 20.3889C1.80512 20.5829 2.03549 20.7367 2.28902 20.8416C2.54256 20.9465 2.81429 21.0003 3.08865 21H7.28865C7.56302 21.0003 7.83474 20.9465 8.08828 20.8416C8.34181 20.7367 8.57218 20.5829 8.76618 20.3889C8.96019 20.1949 9.11403 19.9645 9.21889 19.711C9.32375 19.4574 9.37758 19.1857 9.3773 18.9113V14.7113C9.37531 14.1579 9.15465 13.6277 8.76341 13.2363C8.37218 12.8448 7.84208 12.6239 7.28865 12.6216Z"
-                  stroke="white"
-                  stroke-width="1.75"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-              <a href="#" class="text-white hover:text-gray-400 text-sm">Dashboard</a>
-            </li>
-            <li class="flex items-center space-x-3 group">
-              <svg
-                width="22"
-                height="22"
-                viewBox="0 0 22 22"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M18.94 3.07474C18.1012 2.21136 17.0495 1.5845 15.8911 1.25744C14.7326 0.930374 13.5084 0.914673 12.3419 1.21192C11.1754 1.50917 10.108 2.10885 9.24737 2.95044C8.38672 3.79203 7.76329 4.84575 7.44 6.00527C7.00532 7.55918 7.13203 9.21656 7.79789 10.6863L1 17.5042V21H4.54105L4.20631 18.9053L6.27473 19.2526L8.03263 17.5042L7.69789 15.4095L9.77789 15.7442L11.3253 14.1947C12.7932 14.8611 14.4493 14.9878 16.0015 14.5523C17.5537 14.1169 18.9023 13.1474 19.8095 11.8147C20.7173 10.4814 21.1265 8.87084 20.9652 7.26584C20.8039 5.66084 20.0824 4.16394 18.9274 3.0379L18.94 3.07474Z"
-                  stroke="white"
-                  stroke-width="1.75"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M16.2526 9.13683C15.8362 9.55841 15.2773 9.80923 14.6855 9.84011C14.0937 9.87098 13.5118 9.67969 13.0537 9.30373C12.5957 8.92778 12.2946 8.39428 12.2095 7.80784C12.1244 7.2214 12.2614 6.62432 12.5937 6.13367C12.7894 5.84149 13.0475 5.59633 13.3493 5.41585C13.6512 5.23537 13.9893 5.12406 14.3393 5.08993C14.6893 5.05581 15.0426 5.09971 15.3736 5.21849C15.7046 5.33726 16.0052 5.52795 16.2537 5.77683C16.6947 6.22481 16.9418 6.82822 16.9418 7.45683C16.9418 8.08545 16.6936 8.68886 16.2526 9.13683Z"
-                  stroke="white"
-                  stroke-width="1.75"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-              <a href="#" class="text-white hover:text-gray-400 text-sm">Change Password</a>
-            </li>
-          </ul>
-        </nav>
-      </div>
-      <div class="flex items-center space-x-3" id="log">
-        <svg width="21" height="22" viewBox="0 0 21 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12.1058 20.9944H6.55235C5.15577 21.0583 3.7902 20.5697 2.7511 19.6344C1.712 18.6991 1.08294 17.3923 1 15.9967V6.00332C1.08294 4.60774 1.712 3.30092 2.7511 2.36561C3.7902 1.4303 5.15577 0.941714 6.55235 1.00555H12.1047" stroke="white" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M20.017 11H5.58154" stroke="white" stroke-width="1.75" stroke-miterlimit="10" stroke-linecap="round"/>
-        <path d="M14.923 16.5524L19.684 11.7913C19.8927 11.5808 20.0097 11.2964 20.0097 11C20.0097 10.7036 19.8927 10.4192 19.684 10.2087L14.923 5.44765" stroke="white" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        <button @click="logout" class="text-white hover:text-gray-400 text-sm focus:outline-none">
-          Logout
-        </button>
-      </div>
-    </aside>
+    <Sidebar />
 
     <!-- Main Content -->
     <main class="flex-1 p-8 bg-white">
@@ -171,8 +182,8 @@ tr:hover {
               <td>
                 <span
                   :class="{
+                    'status-in-production': order.status === 'in-production',
                     'status-shipped': order.status === 'shipped',
-                    'status-in-production': order.status === 'in production',
                     'status-canceled': order.status === 'canceled',
                   }"
                 >
@@ -180,11 +191,37 @@ tr:hover {
                 </span>
               </td>
               <td>
-                <a href="#" class="view-details">View Details</a>
+                <div class="actions">
+                  <button @click="viewOrderDetails(order)" class="view-details">
+                    View Details
+                  </button>
+                  <button @click="deleteOrder(order.id)" class="delete-btn">Delete</button>
+                </div>
               </td>
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- Popup voor Order Details -->
+      <div v-if="selectedOrder" class="popup-overlay">
+        <div class="popup-content">
+          <h2>Order Details</h2>
+          <p><strong>Customer:</strong> {{ selectedOrder.customer }}</p>
+          <p><strong>Order Date:</strong> {{ selectedOrder.date }}</p>
+          <p><strong>Status:</strong> {{ selectedOrder.status }}</p>
+          <select
+            v-model="selectedOrder.status"
+            @change="updateOrderStatus(selectedOrder.id, selectedOrder.status)"
+          >
+            <option value="in-production">In Production</option>
+            <option value="shipped">Shipped</option>
+            <option value="canceled">Canceled</option>
+          </select>
+          <button @click="closePopup" class="mt-4 bg-black text-white py-2 px-4 rounded">
+            Close
+          </button>
+        </div>
       </div>
     </main>
   </div>
@@ -192,12 +229,16 @@ tr:hover {
 
 <script>
 import { ref, onMounted } from 'vue'
+import Sidebar from '../components/Sidebar.vue';
 
 export default {
+  components: { Sidebar },
   setup() {
     const totalOrders = ref(0)
     const orders = ref([])
+    const selectedOrder = ref(null)
 
+    // Fetch Orders
     const fetchOrders = async () => {
       try {
         const response = await fetch(
@@ -225,16 +266,80 @@ export default {
       }
     }
 
+    // View Order Details
+    const viewOrderDetails = (order) => {
+      selectedOrder.value = { ...order }
+    }
+
+    // Close Popup
+    const closePopup = () => {
+      selectedOrder.value = null
+    }
+
+    // Delete Order
+    const deleteOrder = async (id) => {
+      try {
+        const response = await fetch(
+          `https://sneaker-configurator-backend.onrender.com/api/v1/orders/${id}`,
+          {
+            method: 'DELETE',
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+          },
+        )
+        if (response.ok) {
+          orders.value = orders.value.filter((order) => order.id !== id)
+          totalOrders.value = orders.value.length
+        } else {
+          console.error('Failed to delete order')
+        }
+      } catch (error) {
+        console.error('Error deleting order:', error)
+      }
+    }
+
+    // Update Order Status
+    const updateOrderStatus = async (id, status) => {
+      try {
+        const response = await fetch(
+          `https://sneaker-configurator-backend.onrender.com/api/v1/orders/${id}`,
+          {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+            body: JSON.stringify({ status }),
+          },
+        )
+        if (response.ok) {
+          const updatedOrder = orders.value.find((order) => order.id === id)
+          if (updatedOrder) {
+            updatedOrder.status = status // Update status live
+          }
+          console.log('Order status updated successfully')
+        } else {
+          console.error('Failed to update order status')
+        }
+      } catch (error) {
+        console.error('Error updating order status:', error)
+      }
+    }
+
     onMounted(() => {
       fetchOrders()
     })
 
-    const logout = () => {
-      localStorage.removeItem('token')
-      window.location.href = '/'
+    return {
+      totalOrders,
+      orders,
+      selectedOrder,
+      viewOrderDetails,
+      closePopup,
+      deleteOrder,
+      updateOrderStatus,
     }
-
-    return { totalOrders, orders, logout }
   },
 }
 </script>
