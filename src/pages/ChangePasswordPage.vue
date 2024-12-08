@@ -8,16 +8,6 @@
         <h1 class="text-xl font-bold text-gray-800 mb-4">Change Password</h1>
         <form @submit.prevent="handleChangePassword" class="space-y-6">
           <div>
-            <label for="currentPassword" class="block text-sm font-medium text-gray-700">Current Password</label>
-            <input
-              id="currentPassword"
-              v-model="currentPassword"
-              type="password"
-              placeholder="Enter your current password"
-              class="mt-1 block w-full px-4 py-2 border border-gray-300 bg-white text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 sm:text-sm"
-            />
-          </div>
-          <div>
             <label for="newPassword" class="block text-sm font-medium text-gray-700">New Password</label>
             <input
               id="newPassword"
@@ -26,6 +16,7 @@
               placeholder="Enter your new password"
               class="mt-1 block w-full px-4 py-2 border border-gray-300 bg-white text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 sm:text-sm"
             />
+            <p v-if="errorNewPassword" class="text-red-500 text-sm mt-1">{{ errorNewPassword }}</p>
           </div>
           <div>
             <label for="confirmPassword" class="block text-sm font-medium text-gray-700">Confirm New Password</label>
@@ -36,6 +27,7 @@
               placeholder="Confirm your new password"
               class="mt-1 block w-full px-4 py-2 border border-gray-300 bg-white text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 sm:text-sm"
             />
+            <p v-if="errorConfirmPassword" class="text-red-500 text-sm mt-1">{{ errorConfirmPassword }}</p>
           </div>
           <button
             type="submit"
@@ -59,23 +51,55 @@ import Sidebar from '../components/Sidebar.vue';
 export default {
   components: { Sidebar },
   setup() {
-    const currentPassword = ref('');
     const newPassword = ref('');
     const confirmPassword = ref('');
     const errorMessage = ref('');
     const successMessage = ref('');
+    const errorNewPassword = ref('');
+    const errorConfirmPassword = ref('');
     const router = useRouter();
 
+    const decodeUserId = () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          return payload.uid;
+        } catch (error) {
+          console.error('Error decoding token:', error);
+          return null;
+        }
+      }
+      return null;
+    };
+
     const handleChangePassword = async () => {
-      if (!currentPassword.value || !newPassword.value || !confirmPassword.value) {
-        errorMessage.value = 'All fields are required.';
-        successMessage.value = '';
+      errorNewPassword.value = '';
+      errorConfirmPassword.value = '';
+      errorMessage.value = '';
+      successMessage.value = '';
+
+      // Basic validations
+      if (!newPassword.value) {
+        errorNewPassword.value = 'New password is required.';
+        return;
+      }
+      if (newPassword.value.length < 8) {
+        errorNewPassword.value = 'New password must be at least 8 characters.';
+        return;
+      }
+      if (!/[A-Z]/.test(newPassword.value)) {
+        errorNewPassword.value = 'New password must contain at least one uppercase letter.';
+        return;
+      }
+      if (newPassword.value !== confirmPassword.value) {
+        errorConfirmPassword.value = 'Passwords do not match.';
         return;
       }
 
-      if (newPassword.value !== confirmPassword.value) {
-        errorMessage.value = 'New passwords do not match.';
-        successMessage.value = '';
+      const userId = decodeUserId();
+      if (!userId) {
+        errorMessage.value = 'User ID not found. Please log in again.';
         return;
       }
 
@@ -87,7 +111,7 @@ export default {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
           body: JSON.stringify({
-            currentPassword: currentPassword.value,
+            userId,
             newPassword: newPassword.value,
           }),
         });
@@ -96,27 +120,25 @@ export default {
 
         if (data.status === 'success') {
           successMessage.value = 'Password changed successfully.';
-          errorMessage.value = '';
           setTimeout(() => {
             router.push('/dashboard');
           }, 2000);
         } else {
           errorMessage.value = data.message || 'Failed to change password.';
-          successMessage.value = '';
         }
       } catch (error) {
         console.error('Error changing password:', error);
         errorMessage.value = 'An error occurred. Please try again later.';
-        successMessage.value = '';
       }
     };
 
     return {
-      currentPassword,
       newPassword,
       confirmPassword,
       errorMessage,
       successMessage,
+      errorNewPassword,
+      errorConfirmPassword,
       handleChangePassword,
     };
   },
@@ -124,5 +146,10 @@ export default {
 </script>
 
 <style scoped>
-/* Optional: Additional styling if needed */
+.text-green-500 {
+  color: #10b981;
+}
+.text-red-500 {
+  color: #ef4444;
+}
 </style>
