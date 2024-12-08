@@ -10,21 +10,74 @@ nav ul li:hover svg path {
 nav ul li:hover a {
   color: #9ca3af;
 }
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+
+.table-container {
+  overflow-x: auto;
 }
 
-.truncate {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+th {
+  background-color: #f4f4f4;
+  color: #333;
+  font-weight: bold;
+}
+
+tr:hover {
+  background-color: #f9f9f9;
+}
+
+.status-shipped {
+  background-color: #d1fae5;
+  color: #065f46;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.status-in-production {
+  background-color: #fef08a;
+  color: #854d0e;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.status-canceled {
+  background-color: #fecaca;
+  color: #991b1b;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.view-details {
+  color: #fff;
+  background-color: #000;
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  text-align: center;
+  display: inline-block;
+}
+
+.view-details:hover {
+  background-color: #333;
 }
 </style>
 
 <template>
   <div class="min-h-screen flex bg-gray-100">
 
+    <!-- Sidebar -->
     <aside class="bg-black text-white w-64 flex flex-col justify-between py-10 px-6">
       <div>
         <div class="flex justify-start mb-12">
@@ -91,6 +144,7 @@ nav ul li:hover a {
       </div>
     </aside>
 
+    <!-- Main Content -->
     <main class="flex-1 p-8 bg-white">
       <h1 class="text-2xl font-bold text-gray-800 mb-4">Orders Overview</h1>
 
@@ -100,28 +154,37 @@ nav ul li:hover a {
         </p>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div
-          v-for="order in orders"
-          :key="order.id"
-          class="bg-gray-200 p-4 shadow-md flex flex-col space-y-2"
-        >
-          <h3 class="font-bold text-lg text-gray-800 truncate">{{ order.customer }}</h3>
-          <p class="text-sm text-gray-700">Order Date: {{ order.date }}</p>
-          <p
-            class="text-sm font-semibold px-1 py-1"
-            :class="{
-              'bg-green-300 text-green-800': order.status === 'shipped',
-              'bg-yellow-300 text-yellow-800': order.status === 'in production',
-              'bg-red-300 text-red-800': order.status === 'canceled',
-            }"
-          >
-            Status: {{ order.status }}
-          </p>
-          <button class="mt-auto bg-black text-white py-2 px-4 hover:bg-gray-800">
-            View Details
-          </button>
-        </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Customer</th>
+              <th>Order Date</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="order in orders" :key="order.id">
+              <td>{{ order.customer }}</td>
+              <td>{{ order.date }}</td>
+              <td>
+                <span
+                  :class="{
+                    'status-shipped': order.status === 'shipped',
+                    'status-in-production': order.status === 'in production',
+                    'status-canceled': order.status === 'canceled',
+                  }"
+                >
+                  {{ order.status }}
+                </span>
+              </td>
+              <td>
+                <a href="#" class="view-details">View Details</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </main>
   </div>
