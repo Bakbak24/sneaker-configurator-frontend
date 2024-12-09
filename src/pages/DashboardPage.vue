@@ -80,6 +80,15 @@ tr:hover {
   margin-bottom: 0.5rem;
 }
 
+.popup-content ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.popup-content li {
+  margin-bottom: 0.5rem;
+}
+
 .popup-content select {
   margin-top: 0.5rem;
   width: 100%;
@@ -149,6 +158,16 @@ tr:hover {
 .delete-btn:hover {
   background-color: #cc1f1a;
 }
+
+.color-block {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin-right: 0.5rem;
+  margin-left: 0.5rem;
+  border: 1px solid #ccc;
+  vertical-align: middle;
+}
 </style>
 
 <template>
@@ -210,6 +229,47 @@ tr:hover {
           <p><strong>Customer:</strong> {{ selectedOrder.customer }}</p>
           <p><strong>Order Date:</strong> {{ selectedOrder.date }}</p>
           <p><strong>Status:</strong> {{ selectedOrder.status }}</p>
+
+          <h3><strong>Customization Details:</strong></h3>
+          <ul>
+            <li>
+              <strong>Lace Color:</strong>
+              <div
+                class="color-block"
+                :style="{ backgroundColor: selectedOrder.laceColor?.color || '#ccc' }"
+              ></div>
+              <span>{{ selectedOrder.laceColor?.color || 'none' }}</span>
+              (Material: {{ selectedOrder.laceColor?.material || 'none' }})
+            </li>
+            <li>
+              <strong>Sole Color:</strong>
+              <div
+                class="color-block"
+                :style="{ backgroundColor: selectedOrder.soleColor?.color || '#ccc' }"
+              ></div>
+              <span>{{ selectedOrder.soleColor?.color || 'none' }}</span>
+              (Material: {{ selectedOrder.soleColor?.material || 'none' }})
+            </li>
+            <li>
+              <strong>Tongue Color:</strong>
+              <div
+                class="color-block"
+                :style="{ backgroundColor: selectedOrder.tongueColor?.color || '#ccc' }"
+              ></div>
+              <span>{{ selectedOrder.tongueColor?.color || 'none' }}</span>
+              (Material: {{ selectedOrder.tongueColor?.material || 'none' }})
+            </li>
+            <li>
+              <strong>Tip Color:</strong>
+              <div
+                class="color-block"
+                :style="{ backgroundColor: selectedOrder.tipColor?.color || '#ccc' }"
+              ></div>
+              <span>{{ selectedOrder.tipColor?.color || 'none' }}</span>
+              (Material: {{ selectedOrder.tipColor?.material || 'none' }})
+            </li>
+          </ul>
+
           <select
             v-model="selectedOrder.status"
             @change="updateOrderStatus(selectedOrder.id, selectedOrder.status)"
@@ -229,7 +289,7 @@ tr:hover {
 
 <script>
 import { ref, onMounted } from 'vue'
-import Sidebar from '../components/Sidebar.vue';
+import Sidebar from '../components/Sidebar.vue'
 
 export default {
   components: { Sidebar },
@@ -256,6 +316,10 @@ export default {
             customer: order.customerName || order.customerEmail,
             date: new Date(order.createdAt).toLocaleDateString(),
             status: order.status,
+            laceColor: order.laceColor,
+            soleColor: order.soleColor,
+            tongueColor: order.tongueColor,
+            tipColor: order.tipColor,
           }))
           totalOrders.value = orders.value.length
         } else {
@@ -268,7 +332,13 @@ export default {
 
     // View Order Details
     const viewOrderDetails = (order) => {
-      selectedOrder.value = { ...order }
+      selectedOrder.value = {
+        ...order,
+        laceColor: order.laceColor || { color: null, material: 'none' },
+        soleColor: order.soleColor || { color: null, material: 'none' },
+        tongueColor: order.tongueColor || { color: null, material: 'none' },
+        tipColor: order.tipColor || { color: null, material: 'none' },
+      }
     }
 
     // Close Popup
